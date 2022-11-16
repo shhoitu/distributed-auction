@@ -1,0 +1,23 @@
+syntax = "proto3";
+package auction;
+option go_package = "github.com/shhoitu/distributed-auction;auction";
+
+service Auction {
+    rpc MakeBid(Bid) returns (Ack);
+    rpc GetStatus(Empty) returns (Status);
+}
+
+message Bid {
+    int32 bidderId = 1;
+    int32 amount = 2;
+}
+
+message Status {
+    string status = 1;
+    int32 secondsLeft = 2;
+    int32 highestBid = 3;
+}
+
+message Ack { }
+
+message Empty { }
