@@ -1,1 +1,1 @@
-# distributed-auction
+# Distributed auction system
