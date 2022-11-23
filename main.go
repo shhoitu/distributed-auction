@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 	glog "google.golang.org/grpc/grpclog"
@@ -12,6 +13,10 @@ import (
 )
 
 var grpcLog glog.LoggerV2
+
+func init() {
+	grpcLog = glog.NewLoggerV2(os.Stdout, os.Stdout, os.Stdout)
+}
 
 type FrontEnd struct {
 	replicationClients map[int]auction.AuctionClient // Map port to replication server
@@ -25,7 +30,7 @@ func main() {
 	// beer.RegisterDistributedMutexServer(grpcServer, p)
 	numberOfReplicationServers := 3
 
-	frontEnd := &FrontEnd{}
+	frontEnd := &FrontEnd{replicationClients: make(map[int]auction.AuctionClient)}
 
 	// Setup frontEnd client side
 	for i := 0; i < numberOfReplicationServers; i++ {
@@ -61,6 +66,8 @@ func main() {
 func (frontEnd *FrontEnd) MakeBid(ctx context.Context, bid *auction.Bid) (*auction.Ack, error) {
 	ackChan := make(chan *auction.Ack) // Add buffers if crashing :)
 
+	grpcLog.Infof("Bid: %d", bid.Amount)
+
 	for _, replicationClient := range frontEnd.replicationClients {
 		go func(client auction.AuctionClient) {
 			ack, _ := client.MakeBid(context.Background(), bid)
@@ -74,6 +81,8 @@ func (frontEnd *FrontEnd) MakeBid(ctx context.Context, bid *auction.Bid) (*aucti
 func (frontEnd *FrontEnd) GetStatus(ctx context.Context, empty *auction.Empty) (*auction.Status, error) {
 	statusChan := make(chan *auction.Status) // Add buffers if crashing :)
 
+	grpcLog.Info("Status requested")
+
 	for _, replicationClient := range frontEnd.replicationClients {
 		go func(client auction.AuctionClient) {
 			status, _ := client.GetStatus(context.Background(), empty)
@@ -81,5 +90,6 @@ func (frontEnd *FrontEnd) GetStatus(ctx context.Context, empty *auction.Empty) (
 		}(replicationClient)
 	}
 
+	grpcLog.Info("Sending status")
 	return <-statusChan, nil
 }
