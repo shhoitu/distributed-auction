@@ -58,11 +58,28 @@ func main() {
 	grpcServer.Serve(listener)
 }
 
-func (frontEnd *FrontEnd) MakeBid(context.Context, *auction.Bid) (*auction.Ack, error) {
-	// Send to the fucking replication servers
-	return &auction.Ack{}, nil
+func (frontEnd *FrontEnd) MakeBid(ctx context.Context, bid *auction.Bid) (*auction.Ack, error) {
+	ackChan := make(chan *auction.Ack) // Add buffers if crashing :)
+
+	for _, replicationClient := range frontEnd.replicationClients {
+		go func(client auction.AuctionClient) {
+			ack, _ := client.MakeBid(context.Background(), bid)
+			ackChan <- ack
+		}(replicationClient)
+	}
+
+	return <-ackChan, nil
 }
 
-func (frontEnd *FrontEnd) GetStatus(context.Context, *auction.Empty) (*auction.Status, error) {
-	return &auction.Status{}, nil
+func (frontEnd *FrontEnd) GetStatus(ctx context.Context, empty *auction.Empty) (*auction.Status, error) {
+	statusChan := make(chan *auction.Status) // Add buffers if crashing :)
+
+	for _, replicationClient := range frontEnd.replicationClients {
+		go func(client auction.AuctionClient) {
+			status, _ := client.GetStatus(context.Background(), empty)
+			statusChan <- status
+		}(replicationClient)
+	}
+
+	return <-statusChan, nil
 }
