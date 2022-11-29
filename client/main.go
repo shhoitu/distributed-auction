@@ -9,6 +9,7 @@ import (
 	auction "github.com/shhoitu/distributed-auction/grpc"
 	"google.golang.org/grpc"
 	glog "google.golang.org/grpc/grpclog"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var grpcLog glog.LoggerV2
@@ -41,16 +42,36 @@ func main() {
 		}
 
 		if amount == 0 {
-			status, err := bidder.client.GetStatus(context.Background(), &auction.Empty{})
+			request := auction.StatusRequest{BidderId: bidder.id}
+			status, err := bidder.client.GetStatus(context.Background(), &request)
 			if err != nil {
 				grpcLog.Errorf(err.Error())
 				continue
 			}
-			grpcLog.Infof("HighestBid thing: %d", status.HighestBid)
+
+			timeLeft := status.TimeLeft.AsDuration()
+
+			if timeLeft <= 0 {
+				grpcLog.Info("Auction is over.")
+			} else {
+				grpcLog.Infof("Time left: %v", timeLeft)
+			}
+			grpcLog.Infof("Bidder: %d has the highest bid: %d", status.BidderId, status.HighestBid)
 			continue
 		}
 
-		grpcLog.Info("Sending bid!")
-		bidder.client.MakeBid(context.Background(), &auction.Bid{BidderId: bidder.id, Amount: int32(amount)})
+		bid := auction.Bid{
+			BidderId: bidder.id,
+			Amount:   int32(amount),
+			Time:     timestamppb.Now(),
+		}
+		_, bidErr := bidder.client.MakeBid(context.Background(), &bid)
+
+		if bidErr != nil {
+			grpcLog.Errorf(err.Error())
+			continue
+		}
+
+		grpcLog.Infof("Bid with amount: %d sent!", amount)
 	}
 }

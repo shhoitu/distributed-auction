@@ -7,10 +7,12 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	auction "github.com/shhoitu/distributed-auction/grpc"
 	"google.golang.org/grpc"
 	glog "google.golang.org/grpc/grpclog"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 var grpcLog glog.LoggerV2
@@ -21,6 +23,7 @@ func init() {
 
 type ReplicationManager struct {
 	auction.UnimplementedAuctionServer
+	endTime    time.Time
 	highestBid *auction.Bid
 	bidLock    sync.Mutex
 }
@@ -45,29 +48,48 @@ func main() {
 }
 
 func (replicationManager *ReplicationManager) MakeBid(ctx context.Context, bid *auction.Bid) (*auction.Ack, error) {
-	grpcLog.Infof("Bid: %d", bid.Amount)
+	if replicationManager.endTime.IsZero() {
+		auctionEndTime := bid.Time.AsTime().Add(time.Minute)
+		replicationManager.endTime = auctionEndTime
+		grpcLog.Infof("Setting end time to: %v", auctionEndTime)
+	}
 
-	replicationManager.setHighestBid(bid)
+	if replicationManager.endTime.Before(time.Now()) {
+		grpcLog.Infof("Bidder %d is trying to bid after time ended", bid.BidderId)
+		return &auction.Ack{}, nil
+	}
+
+	if replicationManager.setHighestBid(bid) {
+		grpcLog.Infof("Bidder %d has highest bid of: %d", bid.BidderId, bid.Amount)
+	} else {
+		grpcLog.Infof("The bid %d from bidder %d was too low", bid.Amount, bid.BidderId)
+	}
 	return &auction.Ack{}, nil
 }
 
-func (replicationManager *ReplicationManager) GetStatus(ctx context.Context, empty *auction.Empty) (*auction.Status, error) {
+func (replicationManager *ReplicationManager) GetStatus(ctx context.Context, request *auction.StatusRequest) (*auction.Status, error) {
+	grpcLog.Infof("Bidder: %d is requesting status", request.BidderId)
+
 	highestBid := replicationManager.getHighestBid()
+	timeLeft := time.Until(replicationManager.endTime)
+
 	status := &auction.Status{
-		Status:      "status",
-		SecondsLeft: 0,
-		HighestBid:  highestBid.Amount,
+		TimeLeft:   durationpb.New(timeLeft),
+		HighestBid: highestBid.Amount,
+		BidderId:   highestBid.BidderId,
 	}
+
 	return status, nil
 }
 
-func (replicationManager *ReplicationManager) setHighestBid(bid *auction.Bid) {
+func (replicationManager *ReplicationManager) setHighestBid(bid *auction.Bid) bool {
 	replicationManager.bidLock.Lock()
 	defer replicationManager.bidLock.Unlock()
-	if bid.Amount > replicationManager.highestBid.Amount {
-		replicationManager.highestBid = bid
+	if bid.Amount < replicationManager.highestBid.Amount {
+		return false
 	}
-	grpcLog.Infof("HighestBid set !!!!")
+	replicationManager.highestBid = bid
+	return true
 }
 
 func (replicationManager *ReplicationManager) getHighestBid() *auction.Bid {

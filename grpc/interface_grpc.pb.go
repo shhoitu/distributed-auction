@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuctionClient interface {
 	MakeBid(ctx context.Context, in *Bid, opts ...grpc.CallOption) (*Ack, error)
-	GetStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Status, error)
+	GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*Status, error)
 }
 
 type auctionClient struct {
@@ -43,7 +43,7 @@ func (c *auctionClient) MakeBid(ctx context.Context, in *Bid, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *auctionClient) GetStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Status, error) {
+func (c *auctionClient) GetStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*Status, error) {
 	out := new(Status)
 	err := c.cc.Invoke(ctx, "/auction.Auction/GetStatus", in, out, opts...)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *auctionClient) GetStatus(ctx context.Context, in *Empty, opts ...grpc.C
 // for forward compatibility
 type AuctionServer interface {
 	MakeBid(context.Context, *Bid) (*Ack, error)
-	GetStatus(context.Context, *Empty) (*Status, error)
+	GetStatus(context.Context, *StatusRequest) (*Status, error)
 	mustEmbedUnimplementedAuctionServer()
 }
 
@@ -68,7 +68,7 @@ type UnimplementedAuctionServer struct {
 func (UnimplementedAuctionServer) MakeBid(context.Context, *Bid) (*Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeBid not implemented")
 }
-func (UnimplementedAuctionServer) GetStatus(context.Context, *Empty) (*Status, error) {
+func (UnimplementedAuctionServer) GetStatus(context.Context, *StatusRequest) (*Status, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
 }
 func (UnimplementedAuctionServer) mustEmbedUnimplementedAuctionServer() {}
@@ -103,7 +103,7 @@ func _Auction_MakeBid_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Auction_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(StatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func _Auction_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/auction.Auction/GetStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuctionServer).GetStatus(ctx, req.(*Empty))
+		return srv.(AuctionServer).GetStatus(ctx, req.(*StatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

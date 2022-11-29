@@ -2,22 +2,28 @@ syntax = "proto3";
 package auction;
 option go_package = "github.com/shhoitu/distributed-auction;auction";
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 service Auction {
     rpc MakeBid(Bid) returns (Ack);
-    rpc GetStatus(Empty) returns (Status);
+    rpc GetStatus(StatusRequest) returns (Status);
 }
 
 message Bid {
     int32 bidderId = 1;
     int32 amount = 2;
+    google.protobuf.Timestamp time = 3;
 }
 
 message Status {
-    string status = 1;
-    int32 secondsLeft = 2;
-    int32 highestBid = 3;
+    google.protobuf.Duration timeLeft = 1;
+    int32 highestBid = 2;
+    int32 bidderId = 3;
 }
 
 message Ack { }
 
-message Empty { }
+message StatusRequest { 
+    int32 bidderId = 1;
+}
