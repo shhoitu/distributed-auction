@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -24,15 +25,17 @@ type Bidder struct {
 }
 
 func main() {
-	grpcLog.Info("Trying to dial 8080")
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock())
-	grpcLog.Info("Dialed 8080")
+	id, _ := strconv.ParseInt(os.Args[1], 10, 32)
+
+	frontEndPort := 8010 + (id * 10)
+	grpcLog.Infof("Trying to dial %d", frontEndPort)
+	conn, err := grpc.Dial(fmt.Sprintf(":%v", frontEndPort), grpc.WithInsecure(), grpc.WithBlock())
+	grpcLog.Infof("Dialed %d", frontEndPort)
 	if err != nil {
 		grpcLog.Fatalf("Couldn't connect to service: %v", err)
 	}
 
-	arg1, _ := strconv.ParseInt(os.Args[1], 10, 32)
-	bidder := &Bidder{id: int32(arg1), client: auction.NewAuctionClient(conn)}
+	bidder := &Bidder{id: int32(id), client: auction.NewAuctionClient(conn)}
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {

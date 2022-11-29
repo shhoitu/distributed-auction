@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
+	"time"
 
 	"google.golang.org/grpc"
 	glog "google.golang.org/grpc/grpclog"
@@ -32,11 +34,11 @@ func main() {
 		// Call all the replications (first replication has port 5010)
 		replicationServerPort := 5010 + (10 * i)
 
-		conn, err := grpc.Dial(fmt.Sprintf(":%v", replicationServerPort), grpc.WithInsecure(), grpc.WithBlock())
+		conn, err := grpc.Dial(fmt.Sprintf(":%v", replicationServerPort), grpc.WithTimeout(3*time.Second), grpc.WithInsecure(), grpc.WithBlock())
 
 		if err != nil {
-			grpcLog.Errorf("Failed to listen on port: %v", err)
-			return
+			grpcLog.Errorf("Failed to listen on port: %v, error: %v", replicationServerPort, err)
+			continue
 		}
 
 		defer conn.Close()
@@ -49,12 +51,14 @@ func main() {
 	}
 
 	// Setup frontEnd server side
-	listener, err := net.Listen("tcp", ":8080")
+	arg1, _ := strconv.ParseInt(os.Args[1], 10, 32)
+	ownPort := 8010 + (arg1 * 10)
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", ownPort))
 	if err != nil {
 		grpcLog.Fatalf("Error creating the server %v", err)
 	}
 
-	grpcLog.Info("Starting server at port :8080")
+	grpcLog.Infof("Starting server at port :%d", ownPort)
 
 	grpcServer := grpc.NewServer()
 	auction.RegisterAuctionServer(grpcServer, frontEnd)
@@ -64,7 +68,7 @@ func main() {
 func (frontEnd *FrontEnd) MakeBid(ctx context.Context, bid *auction.Bid) (*auction.Ack, error) {
 	ackChan := make(chan *auction.Ack) // Add buffers if crashing :)
 
-	grpcLog.Infof("Bid: %d from bidder:", bid.Amount, bid.BidderId)
+	grpcLog.Infof("Bid: %d from bidder: %d", bid.Amount, bid.BidderId)
 
 	for index, replicationClient := range frontEnd.replicationClients {
 		go func(client auction.AuctionClient, index int) {
