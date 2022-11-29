@@ -1,0 +1,159 @@
+Replication manager #0:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run server/main.go 0
+2022/11/29 19:54:43 INFO: Starting server at port :5010
+2022/11/29 19:55:30 INFO: Setting end time to: 2022-11-29 18:56:30.337395 +0000 UTC
+2022/11/29 19:55:30 INFO: Bidder 0 has highest bid of: 100
+2022/11/29 19:55:34 INFO: Bidder 1 has highest bid of: 200
+2022/11/29 19:55:37 INFO: Bidder: 2 is requesting status
+2022/11/29 19:55:44 INFO: The bid 199 from bidder 2 was too low
+2022/11/29 19:55:46 INFO: Bidder: 0 is requesting status
+2022/11/29 19:55:55 INFO: Bidder: 1 is requesting status
+2022/11/29 19:55:57 INFO: Bidder 1 has highest bid of: 300
+2022/11/29 19:56:01 INFO: The bid 200 from bidder 1 was too low
+2022/11/29 19:56:05 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:15 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:20 INFO: Bidder 0 has highest bid of: 500
+2022/11/29 19:56:29 INFO: Bidder 1 has highest bid of: 600
+2022/11/29 19:56:32 INFO: Bidder 2 is trying to bid after time ended
+2022/11/29 19:56:33 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:41 INFO: Bidder 0 is trying to bid after time ended
+2022/11/29 19:56:45 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:48 INFO: Bidder: 1 is requesting status
+
+Replication manager #1:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run server/main.go 1
+2022/11/29 19:54:44 INFO: Starting server at port :5020
+2022/11/29 19:55:30 INFO: Setting end time to: 2022-11-29 18:56:30.337395 +0000 UTC
+2022/11/29 19:55:30 INFO: Bidder 0 has highest bid of: 100
+2022/11/29 19:55:34 INFO: Bidder 1 has highest bid of: 200
+2022/11/29 19:55:37 INFO: Bidder: 2 is requesting status
+2022/11/29 19:55:44 INFO: The bid 199 from bidder 2 was too low
+2022/11/29 19:55:46 INFO: Bidder: 0 is requesting status
+2022/11/29 19:55:55 INFO: Bidder: 1 is requesting status
+2022/11/29 19:55:57 INFO: Bidder 1 has highest bid of: 300
+2022/11/29 19:56:01 INFO: The bid 200 from bidder 1 was too low
+2022/11/29 19:56:05 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:15 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:20 INFO: Bidder 0 has highest bid of: 500
+2022/11/29 19:56:29 INFO: Bidder 1 has highest bid of: 600
+2022/11/29 19:56:32 INFO: Bidder 2 is trying to bid after time ended
+2022/11/29 19:56:33 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:41 INFO: Bidder 0 is trying to bid after time ended
+2022/11/29 19:56:45 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:48 INFO: Bidder: 1 is requesting status
+
+Replication manager #2:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run server/main.go 2
+2022/11/29 19:54:46 INFO: Starting server at port :5030
+2022/11/29 19:55:30 INFO: Setting end time to: 2022-11-29 18:56:30.337395 +0000 UTC
+2022/11/29 19:55:30 INFO: Bidder 0 has highest bid of: 100
+2022/11/29 19:55:34 INFO: Bidder 1 has highest bid of: 200
+2022/11/29 19:55:37 INFO: Bidder: 2 is requesting status
+2022/11/29 19:55:44 INFO: The bid 199 from bidder 2 was too low
+2022/11/29 19:55:46 INFO: Bidder: 0 is requesting status
+2022/11/29 19:55:55 INFO: Bidder: 1 is requesting status
+2022/11/29 19:55:57 INFO: Bidder 1 has highest bid of: 300
+2022/11/29 19:56:01 INFO: The bid 200 from bidder 1 was too low
+2022/11/29 19:56:05 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:15 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:20 INFO: Bidder 0 has highest bid of: 500
+2022/11/29 19:56:29 INFO: Bidder 1 has highest bid of: 600
+2022/11/29 19:56:32 INFO: Bidder 2 is trying to bid after time ended
+2022/11/29 19:56:33 INFO: Bidder: 2 is requesting status
+2022/11/29 19:56:41 INFO: Bidder 0 is trying to bid after time ended
+2022/11/29 19:56:45 INFO: Bidder: 0 is requesting status
+2022/11/29 19:56:48 INFO: Bidder: 1 is requesting status
+
+Front-end #0:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run main.go 0
+2022/11/29 19:54:48 INFO: Starting server at port :8010
+2022/11/29 19:55:30 INFO: Bid: 100 from bidder: 0
+2022/11/29 19:55:46 INFO: Status requested
+2022/11/29 19:55:46 INFO: Returning status
+2022/11/29 19:56:15 INFO: Status requested
+2022/11/29 19:56:15 INFO: Returning status
+2022/11/29 19:56:20 INFO: Bid: 500 from bidder: 0
+2022/11/29 19:56:41 INFO: Bid: 800 from bidder: 0
+2022/11/29 19:56:45 INFO: Status requested
+2022/11/29 19:56:45 INFO: Returning status
+
+Front-end #1:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run main.go 1
+2022/11/29 19:54:50 INFO: Starting server at port :8020
+2022/11/29 19:55:34 INFO: Bid: 200 from bidder: 1
+2022/11/29 19:55:55 INFO: Status requested
+2022/11/29 19:55:55 INFO: Returning status
+2022/11/29 19:55:57 INFO: Bid: 300 from bidder: 1
+2022/11/29 19:56:01 INFO: Bid: 200 from bidder: 1
+2022/11/29 19:56:29 INFO: Bid: 600 from bidder: 1
+2022/11/29 19:56:48 INFO: Status requested
+2022/11/29 19:56:48 INFO: Returning status
+
+Front-end #2: 
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run main.go 2
+2022/11/29 19:54:52 INFO: Starting server at port :8030
+2022/11/29 19:55:37 INFO: Status requested
+2022/11/29 19:55:37 INFO: Returning status
+2022/11/29 19:55:44 INFO: Bid: 199 from bidder: 2
+2022/11/29 19:56:05 INFO: Status requested
+2022/11/29 19:56:05 INFO: Returning status
+2022/11/29 19:56:32 INFO: Bid: 400 from bidder: 2
+2022/11/29 19:56:33 INFO: Status requested
+2022/11/29 19:56:33 INFO: Returning status
+
+Client #0:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run client/main.go 0
+2022/11/29 19:54:54 INFO: Trying to dial 8010
+2022/11/29 19:54:54 INFO: Dialed 8010
+100 
+2022/11/29 19:55:30 INFO: Bid with amount: 100 sent!
+0
+2022/11/29 19:55:46 INFO: Time left: 43.626376s
+2022/11/29 19:55:46 INFO: Bidder: 1 has the highest bid: 200
+0
+2022/11/29 19:56:15 INFO: Time left: 15.091898s
+2022/11/29 19:56:15 INFO: Bidder: 1 has the highest bid: 300
+500
+2022/11/29 19:56:20 INFO: Bid with amount: 500 sent!
+800
+2022/11/29 19:56:41 INFO: Bid with amount: 800 sent!
+0
+2022/11/29 19:56:45 INFO: Auction is over.
+2022/11/29 19:56:45 INFO: Bidder: 1 has the highest bid: 600
+
+Client #1:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run client/main.go 1
+2022/11/29 19:54:57 INFO: Trying to dial 8020
+2022/11/29 19:54:57 INFO: Dialed 8020
+200
+2022/11/29 19:55:34 INFO: Bid with amount: 200 sent!
+0
+2022/11/29 19:55:55 INFO: Time left: 34.414582s
+2022/11/29 19:55:55 INFO: Bidder: 1 has the highest bid: 200
+300
+2022/11/29 19:55:57 INFO: Bid with amount: 300 sent!
+200
+2022/11/29 19:56:01 INFO: Bid with amount: 200 sent!
+600
+2022/11/29 19:56:29 INFO: Bid with amount: 600 sent!
+0  
+2022/11/29 19:56:48 INFO: Auction is over.
+2022/11/29 19:56:48 INFO: Bidder: 1 has the highest bid: 600
+
+Client #2:
+sigurd@Sigurds-MacBook-Pro distributed-auction % go run client/main.go 2
+2022/11/29 19:54:58 INFO: Trying to dial 8030
+2022/11/29 19:54:58 INFO: Dialed 8030
+0 
+2022/11/29 19:55:37 INFO: Time left: 52.515907s
+2022/11/29 19:55:37 INFO: Bidder: 1 has the highest bid: 200
+199
+2022/11/29 19:55:44 INFO: Bid with amount: 199 sent!
+0  
+2022/11/29 19:56:05 INFO: Time left: 24.458874s
+2022/11/29 19:56:05 INFO: Bidder: 1 has the highest bid: 300
+400
+2022/11/29 19:56:32 INFO: Bid with amount: 400 sent!
+0
+2022/11/29 19:56:33 INFO: Auction is over.
+2022/11/29 19:56:33 INFO: Bidder: 1 has the highest bid: 600
